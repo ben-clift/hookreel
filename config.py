@@ -52,3 +52,11 @@ FONT_CANDIDATES = [
     "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
     "C:/Windows/Fonts/arialbd.ttf",
 ]
+
+# ---- Screenshots-to-ad mode (AI script + animated real screenshots)
+AI_MODEL = "claude-sonnet-5-5"        # writes the hook and captions
+AI_MIN_SHOTS = 2
+AI_MAX_SHOTS = 8
+AI_SHOT_SECONDS = (2.5, 5.0, 3.5)     # min, max, default seconds per screenshot
+MOTIONS = ["zoom_in", "zoom_out", "pan_left", "pan_right", "pan_up", "pan_down"]
+TONES = ["Cosy and calm", "Funny", "Exciting", "Mysterious", "Wholesome"]

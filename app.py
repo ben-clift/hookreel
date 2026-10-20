@@ -1,8 +1,7 @@
 """Hookreel: turn a gameplay or app screen recording into a short ad."""
 import hashlib
 import os
-import tempfile
-from datetime import datetime, timezone
+from datetime import datetime
 
 import streamlit as st
 
@@ -13,64 +12,10 @@ import store
 st.set_page_config(page_title=config.APP_TITLE, page_icon="🎬", layout="centered")
 
 
-# ----------------------------------------------------------------- settings
-def secret(name: str, default: str = "") -> str:
-    try:
-        return str(st.secrets.get(name, default))
-    except Exception:
-        return default
+import common
+from common import TMP, renders_today
 
-
-def guest_logins() -> dict:
-    try:
-        return dict(st.secrets.get("logins", {}))
-    except Exception:
-        return {}
-
-
-store.configure(secret("SUPABASE_URL"), secret("SUPABASE_KEY"))
-APP_PASSWORD = secret("APP_PASSWORD")
-TMP = os.path.join(tempfile.gettempdir(), "hookreel")
-os.makedirs(TMP, exist_ok=True)
-
-
-# -------------------------------------------------------------------- login
-def login_gate() -> None:
-    if st.session_state.get("ok"):
-        return
-    if not APP_PASSWORD and not guest_logins():
-        st.session_state.update(ok=True, user=config.ADMIN_NAME, local=True)
-        return
-    st.title(config.APP_TITLE)
-    with st.form("login"):
-        name = st.text_input("Name")
-        pw = st.text_input("Password", type="password")
-        go = st.form_submit_button("Log in")
-    if go:
-        n = name.strip()
-        guests = {k.lower(): v for k, v in guest_logins().items()}
-        if n.lower() == config.ADMIN_NAME.lower() and APP_PASSWORD and pw == APP_PASSWORD:
-            st.session_state.update(ok=True, user=config.ADMIN_NAME)
-            st.rerun()
-        elif n.lower() in guests and pw == str(guests[n.lower()]):
-            st.session_state.update(ok=True, user=n.title())
-            st.rerun()
-        else:
-            st.error("Name or password not recognised.")
-    st.stop()
-
-
-login_gate()
-USER = st.session_state.get("user", config.ADMIN_NAME)
-ADMIN = USER.lower() == config.ADMIN_NAME.lower()
-
-
-def today() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
-
-
-def renders_today(user: str) -> int:
-    return sum(1 for r in store.read("renders") if r.get("user") == user and str(r.get("ts", ""))[:10] == today())
+USER, ADMIN = common.boot()
 
 
 def pick_hook(text: str) -> None:  # on_click callback: widget values can only change here

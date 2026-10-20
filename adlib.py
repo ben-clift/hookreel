@@ -143,6 +143,7 @@ class AdSpec:
     keep_audio: bool = True
     icon_path: str | None = None
     end_card: bool = True
+    caption_spans: list | None = None  # optional [(text, start, end)] to line captions up with shots
 
 
 def caption_timings(captions: list[str], length: float, hook_secs: float) -> list[tuple[str, float, float]]:
@@ -219,7 +220,8 @@ def _main_segment(src: str, info: VideoInfo, spec: AdSpec, out: str, tmp: str) -
         filters.append(_drawtext(p, font, hook_size, th["hook_fg"], "(w-text_w)/2", int(H * 0.04),
                                  box=(th["hook_bg"], 1.0), border=int(hook_size * 0.5),
                                  enable=(0.15, min(config.HOOK_SECONDS, L * 0.5)), spacing=12))
-    for i, (c, a, b) in enumerate(caption_timings(spec.captions, L, config.HOOK_SECONDS if hook else 0)):
+    spans = spec.caption_spans or caption_timings(spec.captions, L, config.HOOK_SECONDS if hook else 0)
+    for i, (c, a, b) in enumerate((clean_text(t), a, min(b, L)) for t, a, b in spans if clean_text(t)):
         p = _write(tmp, f"cap{i}.txt", wrap(c, wrap_cap))
         filters.append(_drawtext(p, font, cap_size, th["cap_fg"], "(w-text_w)/2", int(H * (0.80 if vertical else 0.84)),
                                  box=(th["cap_bg"], 0.65), border=int(cap_size * 0.45), enable=(a, b)))
