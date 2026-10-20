@@ -52,7 +52,7 @@ def test_append_read_roundtrip_no_duplicates(monkeypatch):
     calls, db = fresh(monkeypatch)
     store.append("renders", {"user": "Simon", "ts": "2026-10-20T10:00:00+00:00"}, wait=True)
     assert db[0]["kind"] == "renders" and db[0]["data"]["user"] == "Simon"
-    assert calls[0][2]["apikey"] == "secret" and calls[0][2]["Authorization"] == "Bearer secret"
+    assert calls[0][2]["apikey"] == "secret" and calls[0][2]["Authorization"] == "Bearer secret"  # old JWT-style key
     store._cache.clear()
     assert len(store.read("renders")) == 1  # saved copy and in-memory copy are one record
 
@@ -75,3 +75,10 @@ def test_failures_do_not_crash(monkeypatch):
     assert len(store.read("renders")) == 1
     assert "Failed" in store.test_saving()
     assert store.upload_ad(__file__, "x.mp4") is None
+
+
+def test_new_style_secret_key_sends_apikey_only(monkeypatch):
+    calls, _ = fresh(monkeypatch)
+    store.configure("https://x.supabase.co", "sb_secret_abc")
+    store.append("renders", {"user": "Ben"}, wait=True)
+    assert calls[0][2]["apikey"] == "sb_secret_abc" and "Authorization" not in calls[0][2]

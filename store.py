@@ -39,7 +39,9 @@ def status() -> str:
 
 
 def _h(extra: dict | None = None) -> dict:
-    h = {"apikey": _cfg["key"], "Authorization": f"Bearer {_cfg['key']}"}
+    h = {"apikey": _cfg["key"]}
+    if not _cfg["key"].startswith("sb_"):  # new sb_secret_ keys are not JWTs: apikey alone, no Bearer header
+        h["Authorization"] = f"Bearer {_cfg['key']}"
     h.update(extra or {})
     return h
 

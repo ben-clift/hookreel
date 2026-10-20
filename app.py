@@ -43,6 +43,11 @@ with top:
         st.session_state.clear()
         st.rerun()
 
+try:
+    st.page_link("pages/1_Screenshots_to_ad.py", label="No recording? Make an ad from screenshots instead", icon="✨")
+except Exception:
+    pass
+
 if not adlib.ffmpeg_ok():
     st.error("ffmpeg is not installed here, so ads can't be made. On Streamlit Cloud add it to packages.txt.")
     st.stop()
