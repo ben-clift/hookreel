@@ -24,7 +24,20 @@ plain Python modules with no Streamlit inside (adlib.py, store.py, config.py).
 
 Without Supabase keys the app still works, but nothing is kept after a restart and the page says Saving is OFF.
 
-## Adding a paid AI video service later
+## Sound
+The screenshots page can add an original Japanese-style plucked-string music loop (made by the app, nothing to
+license) and a dog bark on every new shot, or your own music and bark recording. The built-in bark is a simple
+synthetic one, a real recording sounds better. Only upload music you have the rights to.
+
+## AI animation (fal.ai)
+Add `FAL_KEY` to the secrets and the screenshots page offers "AI animation": each screenshot is sent to an AI
+image-to-video model (Kling by default, set in config.py) with a prompt that says to leave the board, tiles and
+text alone and move only what you name (the dogs, leaves, snow). It shows an estimated cost and asks you to
+confirm, guests have a daily limit, and clips are cached so repeating a shot is free. This has been tested only
+against a fake server, so make the first real test cheap (2 shots) and check the model names and prices on fal.ai.
+
+## Adding a different AI video service
+(Older note.)
 Screenshot motion is free (ffmpeg). To use an AI video service instead, write one function
 `animate(image, motion, seconds, size, out_path)` that returns a finished clip and pass it to
 `shotlib.build_montage(..., animate=your_function)`. Keep its API key in the Streamlit secrets.

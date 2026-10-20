@@ -21,7 +21,8 @@ def fallback_script(game: str, desc: str, n_shots: int) -> dict:
     game = (game or "the game").strip()
     hook = config.HOOK_TEMPLATES[0] if not desc else f"Meet {game}"
     caps = ["Take a look inside", "Easy to pick up", "Hard to put down", "Made with care"]
-    shots = [{"caption": caps[i % len(caps)], "motion": config.MOTIONS[i % len(config.MOTIONS)]} for i in range(n_shots)]
+    shots = [{"caption": caps[i % len(caps)], "motion": config.MOTIONS[i % len(config.MOTIONS)],
+              "animation": config.DEFAULT_ANIMATION} for i in range(n_shots)]
     return {"hook": hook.replace("{app}", game), "shots": shots, "ai": False}
 
 
@@ -38,7 +39,8 @@ def _parse(text: str, n_shots: int) -> dict:
     for i in range(n_shots):
         s = raw[i] if i < len(raw) and isinstance(raw[i], dict) else {}
         motion = s.get("motion") if s.get("motion") in config.MOTIONS else config.MOTIONS[i % len(config.MOTIONS)]
-        shots.append({"caption": str(s.get("caption", "")).strip(), "motion": motion})
+        anim = str(s.get("animation", "")).strip() or config.DEFAULT_ANIMATION
+        shots.append({"caption": str(s.get("caption", "")).strip(), "motion": motion, "animation": anim})
     return {"hook": hook, "shots": shots, "ai": True}
 
 
@@ -51,7 +53,9 @@ def write_script(game: str, desc: str, tone: str, n_shots: int, api_key: str = "
         f"Game or app name: {game}\nWhat it is: {desc}\nTone: {tone}\n"
         f"The advert shows {n_shots} real screenshots in order, each with slow camera movement.\n"
         f"Return JSON: {{\"hook\": <opening line, max 8 words>, \"shots\": [{n_shots} objects, each "
-        f"{{\"caption\": <max 6 words>, \"motion\": one of {config.MOTIONS}}}]}}"
+        f"{{\"caption\": <max 6 words>, \"motion\": one of {config.MOTIONS}, \"animation\": <what in that "
+        f"screenshot could gently move, only characters or background such as animals, leaves, snow, water, "
+        f"light; never the game board or interface>}}]}}"
     )
     try:
         if client is None:

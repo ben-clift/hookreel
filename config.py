@@ -60,3 +60,17 @@ AI_MAX_SHOTS = 8
 AI_SHOT_SECONDS = (2.5, 5.0, 3.5)     # min, max, default seconds per screenshot
 MOTIONS = ["zoom_in", "zoom_out", "pan_left", "pan_right", "pan_up", "pan_down"]
 TONES = ["Cosy and calm", "Funny", "Exciting", "Mysterious", "Wholesome"]
+
+# ---- AI animation (image to video) through fal.ai. One FAL_KEY, many models.
+# cost_per_clip is a rough figure from fal's pricing page (Oct 2026), check it before relying on it.
+AI_VIDEO = {
+    "Kling 2.5 Turbo (cheaper)": {
+        "endpoint": "fal-ai/kling-video/v2.5-turbo/pro/image-to-video",
+        "cost_per_clip": 0.35, "params": {"duration": "5"}},
+    "Kling 3.0 Pro (better)": {
+        "endpoint": "fal-ai/kling-video/v3/pro/image-to-video",
+        "cost_per_clip": 0.56, "params": {"duration": "5"}},
+}
+AI_VIDEO_DEFAULT = "Kling 2.5 Turbo (cheaper)"
+AI_GUEST_DAILY_VIDEOS = 2          # AI-animated ads per guest per day (admin unlimited)
+DEFAULT_ANIMATION = "the dogs and the gentle falling leaves or snow in the background"
